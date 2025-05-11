@@ -17,14 +17,14 @@ TexturedBackgroundLight {
 }
 RectangleArena {
 }
-E-puck {
-  translation -0.12322512930387708 -0.14415036038743417 -6.431432242310492e-05
+DEF ROBO E-puck {
+  translation 0.025225 0.0080398 -0.000151881
   rotation -0.0003161395898767048 -0.00046414539606941686 -0.999999842312393 1.4917837097153057
   controller "my_controller"
   supervisor TRUE
 }
 DEF C0 Solid {
-  translation -0.12 -0.3 0.05
+  translation -0.22 -0.19 0.05
   children [
     DEF BOX_SHAPE Shape {
       appearance PBRAppearance {
@@ -56,6 +56,48 @@ DEF C0 Solid {
     }
   ]
   name "wooden box"
+  model "wooden box"
+  boundingObject Box {
+    size 0.1 0.1 0.1
+  }
+  physics DEF C0 Physics {
+    density -1
+    mass 10
+  }
+}
+DEF C1 Solid {
+  translation 0.26 0.28 0.05
+  children [
+    DEF BOX_SHAPE Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/textures/wooden_box_base_color.jpg"
+          ]
+        }
+        roughnessMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/textures/wooden_box_roughness.jpg"
+          ]
+        }
+        metalness 0
+        normalMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/textures/wooden_box_normal.jpg"
+          ]
+        }
+        occlusionMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/textures/wooden_box_occlusion.jpg"
+          ]
+        }
+      }
+      geometry Box {
+        size 0.1 0.1 0.1
+      }
+    }
+  ]
+  name "wooden box(1)"
   model "wooden box"
   boundingObject Box {
     size 0.1 0.1 0.1

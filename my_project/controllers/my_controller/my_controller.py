@@ -1,126 +1,223 @@
-"""my_controller controller."""
+# Refactored: CamelCase with Hungarian notation following Python conventions
+import math
 
-# You may need to import some classes of the controller module. Ex:
- # from controller import Robot, Motor, DistanceSensor
-# from controller import Robot
-
-# create the Robot instance.
-# robot = Robot()
-
-# get the time step of the current world.
-# timestep = int(robot.getBasicTimeStep())
-
-# You should insert a getDevice-like function in order to get the
-# instance of a device of the robot. Something like:
- # motor = robot.getDevice('motorname')
- # ds = robot.getDevice('dsname')
- # ds.enable(timestep)
-
-# Main loop:
-# - perform simulation steps until Webots is stopping the controller
-# while robot.step(timestep) != -1:
-    # Read the sensors:
-    # Enter here functions to read sensor data, like:
-     # val = ds.getValue()
-
-    # Process sensor data here.
-
-    # Enter here functions to send actuator commands, like:
-     # motor.setPosition(10.0)
-    # pass
-
-# Enter here exit cleanup code.
 from controller import Supervisor
 
-supervisor = Supervisor()
-# Tempo de passo da simulação
-timestep = int(supervisor.getBasicTimeStep())
-
-left_motor = supervisor.getDevice("left wheel motor")
-right_motor = supervisor.getDevice("right wheel motor")
-
-ds0 = supervisor.getDevice("ps0")  
-ds1 = supervisor.getDevice("ps1") 
-ds2 = supervisor.getDevice("ps2")
-ds3 = supervisor.getDevice("ps3")  
-ds4 = supervisor.getDevice("ps4") 
-ds5 = supervisor.getDevice("ps5") 
-ds6 = supervisor.getDevice("ps6") 
-ds7 = supervisor.getDevice("ps7") 
- 
-
-left_motor.setPosition(float('inf'))
-right_motor.setPosition(float('inf'))
-
-left_motor.setVelocity(0.0)
-right_motor.setVelocity(0.0)
-
-ds0.enable(timestep)
-ds1.enable(timestep)
-ds2.enable(timestep)
-ds3.enable(timestep)
-ds4.enable(timestep)
-ds5.enable(timestep)
-ds6.enable(timestep)
-ds7.enable(timestep)
+iBoxCount = 2
 
 
-bShouldTurnRight = True
-bIsTurning = False
+def wait(supSupervisor, iDurationMs):
+    fStart = supSupervisor.getTime()
+    while supSupervisor.getTime() - fStart < iDurationMs / 1000.0:
+        supSupervisor.step(450)
 
-maxDistance = 110
 
-while supervisor.step(timestep) != -1:
+# Calcula a distância euclidiana entre dois pontos 2D
+def getEuclidianDistance(tplPosA, tplPosB):
+    fXDistance = (tplPosB[0] - tplPosA[0])
+    fYDistance = (tplPosB[1] - tplPosA[1])
+    return math.hypot(fXDistance, fYDistance)
 
-    caixa_node = supervisor.getFromDef("C0")
-    if caixa_node is None:
-        print("Erro: Não foi possível encontrar a caixa.")
-        exit()
 
-    # Acessa o campo de tradução (posição) da caixa
-    translation_field = caixa_node.getField("translation")
-    caixa_pos = translation_field.getSFVec3f()  # retorna [x, y, z]
-    print(f"Posição da caixa: {caixa_pos}")
+def printBoxPositions(lstBoxes):
+    print("\nBox positions:")
+    for iIndex, nodBox in enumerate(lstBoxes):
+        tplPos = nodBox.getPosition()
+        print(f"C{iIndex}: X={tplPos[0]:.2f}, Y={tplPos[1]:.2f}")
 
-    distance0 = ds0.getValue()
-    distance1 = ds1.getValue()
-    distance2 = ds2.getValue()
-    distance3 = ds3.getValue()
-    distance4 = ds4.getValue()
-    distance5 = ds5.getValue()
-    distance6 = ds6.getValue()
-    distance7 = ds7.getValue()
-    
-    if (distance1 < maxDistance and distance2 < maxDistance*0.9 
-        and distance5 < maxDistance*0.9 and distance6 < maxDistance
-        and distance7 < maxDistance and distance0 < maxDistance
-        and ((not bShouldTurnRight and distance3 < maxDistance*0.9) 
-        or (bShouldTurnRight and distance4 < maxDistance*0.9))):
-        
-        left_motor.setVelocity(6.28)
-        right_motor.setVelocity(6.28)
-        
-        bIsTurning = False     
-        
+
+# Inicializa as caixas e registra suas posições iniciais
+def initializeBoxes(supSupervisor):
+    lstBoxes = []
+    dictInitialPositions = {}
+    for iIdx in range(iBoxCount):
+        sDefName = f"C{iIdx}"
+        nodBox = supSupervisor.getFromDef(sDefName)
+        if nodBox:
+            lstBoxes.append(nodBox)
+            dictInitialPositions[sDefName] = tuple(nodBox.getPosition()[0:2])
+    return lstBoxes, dictInitialPositions
+
+
+# Ativa e retorna os sensores de proximidade
+def initializeSensors(supSupervisor):
+    lstSensors = []
+    for i in range(8):
+        sensor = supSupervisor.getDevice(f"ps{i}")
+        sensor.enable(450)
+        lstSensors.append(sensor)
+    return lstSensors
+
+
+def readSensorValues(lstSensors):
+    return [sen.getValue() for sen in lstSensors]
+
+
+# Calcula a direção que o robô precisa ajustar para apontar corretamente para o alvo
+def computeOrientationError(nodRobot, nodTarget):
+    # Posição do robô (x, y, z) — só usaremos x e y
+    lstRobotPosition = nodRobot.getField("translation").getSFVec3f()
+    fXRobot = lstRobotPosition[0]
+    fYRobot = lstRobotPosition[1]
+
+    # Posição da caixa
+    fXBox, fYBox = nodTarget.getPosition()[0:2]
+
+    # Calcula a direção desejada até o alvo
+    fDeltaX = fXBox - fXRobot
+    fDeltaY = fYBox - fYRobot
+    # Angulo ideal para que ele chegue na caixa de forma reta
+    fDesiredAngle = math.atan2(fDeltaY, fDeltaX)
+
+    # Ângulo atual do robô baseado na sua rotação
+    robotRotation = nodRobot.getField("rotation").getSFRotation()
+    iCurrentAngle = robotRotation[3] * (1 if robotRotation[2] >= 0 else -1)
+
+    # Calcula o menor erro angular entre a direção atual e a desejada
+    fRawError = fDesiredAngle - iCurrentAngle
+
+    # Normaliza o erro para o intervalo [-pi, pi], garantindo o menor giro possível
+    angleError = (fRawError + math.pi) % (2 * math.pi) - math.pi
+
+    # Distância entre robô a caixa
+    distance = getEuclidianDistance((fXRobot, fYRobot), (fXBox, fYBox))
+
+    return angleError, distance
+
+
+# Faz o robô se mover em direção ao alvo, desviando de obstáculos e ajustando a direção
+def navigateToTarget(nodRobot, nodTarget, motLeft, motRight, supSupervisor):
+    # TODO FALTA LOGICA DE DESVIAR DAS CAIXAS
+
+    # Calcula o erro de direção e a distância até o alvo
+    directionError, distanceToTarget = computeOrientationError(nodRobot, nodTarget)
+
+    # Se estiver muito desalinhado, gira no lugar para se alinhar
+    if abs(directionError) > 2.5:
+        rotationSpeed = 2.5 if directionError > 0 else -2.5
+        motLeft.setVelocity(-rotationSpeed)
+        motRight.setVelocity(rotationSpeed)
+        wait(supSupervisor, 2000)
+        return
+
+    # Controlador proporcional para ajuste suave de direção
+    gain = 0.6 * (1 + distanceToTarget)
+    baseSpeed = 5.0
+    correction = max(min(gain * directionError, baseSpeed), -baseSpeed)
+
+    # Define as velocidades das rodas com base no ajuste
+    leftSpeed = max(min(baseSpeed - correction, 6.28), -6.28)
+    rightSpeed = max(min(baseSpeed + correction, 6.28), -6.28)
+
+    print(f"[NAVIGATION] Erro angular: {directionError:.2f} rad, Distância até alvo: {distanceToTarget:.2f} m")
+    print(f"[NAVIGATION] Velocidades - Esquerda: {leftSpeed:.2f}, Direita: {rightSpeed:.2f}")
+
+    motLeft.setVelocity(leftSpeed)
+    motRight.setVelocity(rightSpeed)
+
+
+# Verifica se o robô chegou suficientemente perto do alvo (caixa)
+def hasArrived(nodRobot, nodTarget):
+    # Obtém a posição atual do robô
+    tplRobotPos = nodRobot.getField("translation").getSFVec3f()
+    fXRobot = tplRobotPos[0]
+    fYRobot = tplRobotPos[1]
+
+    # Obtém a posição da caixa
+    fXTarget, fYTarget = nodTarget.getPosition()[0:2]
+
+    # Calcula a distância entre o robô e a caixa
+    fDistance = getEuclidianDistance((fXRobot, fYRobot), (fXTarget, fYTarget))
+
+    print(f"[CHECK DISTANCE] Distância até caixa: {fDistance:.4f} m")
+
+    return fDistance <= 0.10
+
+
+# Simula o empurrão da caixa pelo robô durante um tempo definido
+def pushBox(supSupervisor, motLeft, motRight):
+    print("Iniciando empurrão da caixa...")
+
+    # Define a velocidade máxima para ambos os motores
+    fMaxVelocity = 6.28
+    motLeft.setVelocity(fMaxVelocity)
+    motRight.setVelocity(fMaxVelocity)
+
+    iStepsToPushTheBox = 2
+
+    # Executa os ciclos mantendo a velocidade
+    for _ in range(iStepsToPushTheBox):
+        supSupervisor.step(450)
+
+    # Para os motores após o empurrão
+    motLeft.setVelocity(0)
+    motRight.setVelocity(0)
+
+
+def getNearestBox(nodRobot, lstBoxes):
+    # Obtém a posição atual do robô (x, y, z)
+    tplRobotPos = nodRobot.getField("translation").getSFVec3f()
+    xRobot = tplRobotPos[0]
+    yRobot = tplRobotPos[1]
+
+    # Inicializa as variáveis de controle da menor distância
+    iNearestBoxIndex = -1
+    nodNearestBox = None
+    fMinDistance = float('inf')
+
+    # Itera por todas as caixas para encontrar a mais próxima
+    for iIndex, nodBox in enumerate(lstBoxes):
+        # Obtém a posição da caixa (x, y)
+        fXBoxPosition, fYBoxPosition = nodBox.getPosition()[0:2]
+
+        # Calcula a distância entre o robô e a caixa
+        fDistance = getEuclidianDistance((xRobot, yRobot), (fXBoxPosition, fYBoxPosition))
+
+        # Atualiza o mais próximo, se necessário
+        if fDistance < fMinDistance:
+            fMinDistance = fDistance
+            iNearestBoxIndex = iIndex
+            nodNearestBox = nodBox
+
+    return iNearestBoxIndex, nodNearestBox
+
+
+supSupervisor = Supervisor()
+motLeft = supSupervisor.getDevice("left wheel motor")
+motRight = supSupervisor.getDevice("right wheel motor")
+motLeft.setPosition(float('inf'))
+motRight.setPosition(float('inf'))
+lstSensors = initializeSensors(supSupervisor)
+robot = supSupervisor.getFromDef("ROBO")
+
+lstBoxes, dictInitialPositions = initializeBoxes(supSupervisor)
+lstRemainingBoxes = lstBoxes.copy()
+
+# Loop principal do controle do robô
+while supSupervisor.step(450) != -1:
+
+    if len(lstRemainingBoxes) == 0:
+        break
+
+    iNearestBoxIndex, nodNearestBox = getNearestBox(robot, lstRemainingBoxes)
+    if hasArrived(robot, nodNearestBox):
+        pushBox(supSupervisor, motLeft, motRight)
+        print(f"Finalizou empurrar, indo para a próxima caixa")
+        lstRemainingBoxes.pop(iNearestBoxIndex)
     else:
-        
-        print("------------------------")
-        if(distance0 > maxDistance): print("D0")
-        if(distance1 > maxDistance): print("D1")
-        if(distance2 > maxDistance*0.9): print("D2")
-        if(distance3 > maxDistance*0.9): print("D3")
-        if(distance4 > maxDistance*0.9): print("D4")
-        if(distance5 > maxDistance*0.9): print("D5")
-        if(distance6 > maxDistance): print("D6")
-        if(distance7 > maxDistance): print("D7") 
-        print("------------------------")
-    
-        if(not bIsTurning):
-            bIsTurning = True
-            bShouldTurnRight = not bShouldTurnRight
-        if(bShouldTurnRight):
-            left_motor.setVelocity(4)
-            right_motor.setVelocity(-0.5)
-        else:
-            left_motor.setVelocity(-0.5)
-            right_motor.setVelocity(4)     
+        navigateToTarget(robot, nodNearestBox, motLeft, motRight, supSupervisor)
+
+print("\n[RESULTADO FINAL] Análise do deslocamento das caixas:")
+for iIdx, nodBox in enumerate(lstBoxes):
+    sBoxId = f"C{iIdx}"
+    tplStartPosition = dictInitialPositions[sBoxId]
+    tplEndPosition = nodBox.getPosition()[0:2]
+    fMovedDistance = getEuclidianDistance(tplStartPosition, tplEndPosition)
+    sBoxStatus = "LEVE" if fMovedDistance > 0.001 else "PESADA"
+    if fMovedDistance <= 0.001 and sBoxStatus == "LEVE":
+        print(f"     [ALERTA] A caixa {sBoxId} foi marcada como LEVE, mas não se moveu!")
+    print(f" - {sBoxId}")
+    print(f"     Posição inicial: X={tplStartPosition[0]:.2f}, Y={tplStartPosition[1]:.2f}")
+    print(f"     Posição final  : X={tplEndPosition[0]:.2f}, Y={tplEndPosition[1]:.2f}")
+    print(f"     Deslocamento   : {fMovedDistance:.4f} metros")
+    print(f"     Resultado      : {sBoxStatus}")
