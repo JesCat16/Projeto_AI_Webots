@@ -3,7 +3,7 @@ import math
 
 from controller import Supervisor
 
-iBoxCount = 4
+iBoxCount = 6
 
 
 def wait(supSupervisor, iDurationMs):
@@ -88,7 +88,25 @@ def computeOrientationError(nodRobot, nodTarget):
 # Faz o robô se mover em direção ao alvo, desviando de obstáculos e ajustando a direção
 def navigateToTarget(nodRobot, nodTarget, motLeft, motRight, supSupervisor):
     # TODO FALTA LOGICA DE DESVIAR DAS CAIXAS
+    # Leitura dos sensores
+    lstSensorValues = readSensorValues(lstSensors)
 
+    # Detecta obstáculo à frente (sensores frontais)
+    isObstacleFront = lstSensorValues[0] > 80 or lstSensorValues[1] > 80 or lstSensorValues[6] > 80 or lstSensorValues[7] > 80
+
+    if isObstacleFront:
+        #print("[EVASÃO] Obstáculo à frente detectado! Desviando...")
+
+        # Gira no lugar para desviar
+        motLeft.setVelocity(-2.5)
+        motRight.setVelocity(2.5)
+
+        wait(supSupervisor, 1000)
+
+        motLeft.setVelocity(0)
+        motRight.setVelocity(0)
+
+        return  # Sai da função para não continuar a navegação
     # Calcula o erro de direção e a distância até o alvo
     directionError, distanceToTarget = computeOrientationError(nodRobot, nodTarget)
 
@@ -183,13 +201,14 @@ def getNearestBox(nodRobot, lstBoxes):
 
 def rotateRobotInPlace(motLeft, motRight, supSupervisor, fSeconds=1.5, fSpeed=2.5):
     print("[ROBOT] Caixa leve detectada. Girando no próprio eixo...")
-    motLeft.setVelocity(-fSpeed)
-    motRight.setVelocity(fSpeed)
+    for i in range(2):
+        motLeft.setVelocity(-fSpeed)
+        motRight.setVelocity(fSpeed)
 
-    wait(supSupervisor, int(fSeconds * 1000))
+        wait(supSupervisor, int(fSeconds * 1000))
 
-    motLeft.setVelocity(0)
-    motRight.setVelocity(0)
+        motLeft.setVelocity(0)
+        motRight.setVelocity(0)
 
 supSupervisor = Supervisor()
 motLeft = supSupervisor.getDevice("left wheel motor")

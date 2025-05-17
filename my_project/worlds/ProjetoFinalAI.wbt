@@ -8,8 +8,8 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 WorldInfo {
 }
 Viewpoint {
-  orientation 0.14422274069664298 0.09577056487242808 -0.9848998933749382 1.9831823011427085
-  position 0.29219836858255444 0.7073980161391 0.44543393551178234
+  orientation -0.5640400354553822 0.670810528819217 0.48153096767370374 2.1014154257960076
+  position -0.1871525032962644 0.33363815717300577 2.7800378752293216
 }
 TexturedBackground {
 }
@@ -18,18 +18,14 @@ TexturedBackgroundLight {
 RectangleArena {
 }
 DEF ROBO E-puck {
-  hidden translation_1 0 0.026000000000000075 0.02
-  hidden rotation_1 0 0.9999999999999999 0 5.574111737229749
-  hidden translation_2 0 -0.026 0.02
-  hidden rotation_2 0 1 0 0.49954378569741476
-  translation -0.0641108 -0.0178526 0.00023101
-  rotation 0.0007152408157999823 -5.917518476027956e-05 -0.9999997424644033 -2.976505307179586
+  translation 0.08721860014807563 0.0820817999838875 -6.396199578852756e-05
+  rotation 1.0964645339895284e-09 7.984951190560595e-10 -1 1.6710913204162217
   controller "my_controller"
   supervisor TRUE
 }
 DEF C0 Solid {
-  translation -0.22000168259223385 -0.1899720160412215 0.046076165348037275
-  rotation -0.9999927157821703 0.0012529692362997728 0.0036053364187636897 0.0004547884047908879
+  translation -0.16405325619317623 -0.0900619822398721 0.046076000000000006
+  rotation -6.762206563321513e-13 6.519654556908341e-13 -1 5.8883348795835136e-05
   children [
     DEF BOX_SHAPE Shape {
       appearance PBRAppearance {
@@ -70,9 +66,95 @@ DEF C0 Solid {
     mass 10
   }
 }
+DEF C5 Solid {
+  translation -0.297398 -0.319991 0.046076
+  rotation -3.9037848411383734e-12 2.9148291413237453e-12 -1 1.9095034377027845e-05
+  children [
+    DEF BOX_SHAPE Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/textures/wooden_box_base_color.jpg"
+          ]
+        }
+        roughnessMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/textures/wooden_box_roughness.jpg"
+          ]
+        }
+        metalness 0
+        normalMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/textures/wooden_box_normal.jpg"
+          ]
+        }
+        occlusionMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/textures/wooden_box_occlusion.jpg"
+          ]
+        }
+      }
+      geometry Box {
+        size 0.1 0.1 0.1
+      }
+    }
+  ]
+  name "wooden box(5)"
+  model "wooden box"
+  boundingObject Box {
+    size 0.1 0.1 0.1
+  }
+  physics DEF C0 Physics {
+    density -1
+    mass 10
+  }
+}
+DEF C4 Solid {
+  translation -0.03000144355635509 0.37772919479920486 0.04607600000000001
+  rotation -4.638209946900889e-13 1.50649708844079e-12 -1 1.8321999702088672e-05
+  children [
+    DEF BOX_SHAPE Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/textures/wooden_box_base_color.jpg"
+          ]
+        }
+        roughnessMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/textures/wooden_box_roughness.jpg"
+          ]
+        }
+        metalness 0
+        normalMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/textures/wooden_box_normal.jpg"
+          ]
+        }
+        occlusionMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/textures/wooden_box_occlusion.jpg"
+          ]
+        }
+      }
+      geometry Box {
+        size 0.1 0.1 0.1
+      }
+    }
+  ]
+  name "wooden box(4)"
+  model "wooden box"
+  boundingObject Box {
+    size 0.1 0.1 0.1
+  }
+  physics DEF C0 Physics {
+    density -1
+    mass 10
+  }
+}
 DEF C1 Solid {
-  translation -0.22 0.21 0.046076000000000006
-  rotation 0.025299859374635095 0.025299859374927822 0.9993597121313389 5.392291049722647e-16
+  translation -0.3599934093028281 0.20999900012983455 0.046076
+  rotation -1.2835289026218738e-12 -6.817850966711947e-12 1 1.5597849399191848e-05
   children [
     DEF BOX_SHAPE Shape {
       appearance PBRAppearance {
@@ -114,8 +196,8 @@ DEF C1 Solid {
   }
 }
 DEF C2 Solid {
-  translation 0.22 -0.33 0.046076000000000006
-  rotation 0.09073504040599376 0.09073504040614272 0.9917329806379428 1.5035448780907647e-16
+  translation 0.22000040969124857 -0.33000001896922554 0.046076000000000006
+  rotation 8.97411621092906e-12 7.99498122861818e-12 -1 3.827285947910964e-06
   children [
     DEF BOX_SHAPE Shape {
       appearance PBRAppearance {
@@ -157,8 +239,8 @@ DEF C2 Solid {
   }
 }
 DEF C3 Solid {
-  translation 0.26 0.28 0.04999607988564803
-  rotation -0.8151616473659973 -0.5434410982439993 -0.20045762994435853 4.9030801455947716e-17
+  translation 0.271764 0.21 0.0499961
+  rotation -1.0476178465899946e-11 5.420559646347552e-11 1 1.042698468121558e-06
   children [
     DEF BOX_SHAPE Shape {
       appearance PBRAppearance {
