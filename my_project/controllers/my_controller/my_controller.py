@@ -3,7 +3,7 @@ import math
 
 from controller import Supervisor
 
-iBoxCount = 2
+iBoxCount = 4
 
 
 def wait(supSupervisor, iDurationMs):
@@ -181,6 +181,15 @@ def getNearestBox(nodRobot, lstBoxes):
 
     return iNearestBoxIndex, nodNearestBox
 
+def rotateRobotInPlace(motLeft, motRight, supSupervisor, fSeconds=1.5, fSpeed=2.5):
+    print("[ROBOT] Caixa leve detectada. Girando no próprio eixo...")
+    motLeft.setVelocity(-fSpeed)
+    motRight.setVelocity(fSpeed)
+
+    wait(supSupervisor, int(fSeconds * 1000))
+
+    motLeft.setVelocity(0)
+    motRight.setVelocity(0)
 
 supSupervisor = Supervisor()
 motLeft = supSupervisor.getDevice("left wheel motor")
@@ -201,9 +210,19 @@ while supSupervisor.step(450) != -1:
 
     iNearestBoxIndex, nodNearestBox = getNearestBox(robot, lstRemainingBoxes)
     if hasArrived(robot, nodNearestBox):
+        
+        sBoxId = f"C{iNearestBoxIndex}"
+        tplStartPos = dictInitialPositions[sBoxId]
+        
         pushBox(supSupervisor, motLeft, motRight)
+        
+        tplEndPos = nodNearestBox.getPosition()[0:2]
+        fMovedDistance = getEuclidianDistance(tplStartPos, tplEndPos)
+        
         print(f"Finalizou empurrar, indo para a próxima caixa")
         lstRemainingBoxes.pop(iNearestBoxIndex)
+        if fMovedDistance > 0.001:
+            rotateRobotInPlace(motLeft, motRight, supSupervisor)
     else:
         navigateToTarget(robot, nodNearestBox, motLeft, motRight, supSupervisor)
 
@@ -213,12 +232,7 @@ for iIdx, nodBox in enumerate(lstBoxes):
     tplStartPosition = dictInitialPositions[sBoxId]
     tplEndPosition = nodBox.getPosition()[0:2]
     fMovedDistance = getEuclidianDistance(tplStartPosition, tplEndPosition)
-    sBoxStatus = "LEVE" 
-    if fMovedDistance > 0.001:
-        motLeft.setVelocity(2.0)    # frente
-        motRight.setVelocity(-2.0)  # trás
-    else:
-         "PESADA"
+    sBoxStatus = "LEVE" if fMovedDistance > 0.001 else "PESADA"
     if fMovedDistance <= 0.001 and sBoxStatus == "LEVE":
         print(f"     [ALERTA] A caixa {sBoxId} foi marcada como LEVE, mas não se moveu!")
     print(f" - {sBoxId}")
