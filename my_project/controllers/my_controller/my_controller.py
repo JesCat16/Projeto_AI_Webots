@@ -3,7 +3,7 @@ import math
 
 from controller import Supervisor
 
-iBoxCount = 6
+iBoxCount = 5
 
 def boxMovedSignificantly(tplBefore, tplAfter, fThreshold=0.02):
     """Retorna True se a caixa se moveu mais que o limite especificado"""
@@ -250,6 +250,8 @@ while supSupervisor.step(450) != -1:
         lstRemainingBoxes.pop(iNearestBoxIndex)
         if bMoved:
             rotateRobotInPlace(motLeft, motRight, supSupervisor)
+            print(f"[INFO] Caixa leve encontrada. Parando execução.")
+            break
             
         print(f"Finalizou empurrar, indo para a próxima caixa")
     else:
