@@ -5,6 +5,10 @@ from controller import Supervisor
 
 iBoxCount = 6
 
+def boxMovedSignificantly(tplBefore, tplAfter, fThreshold=0.02):
+    """Retorna True se a caixa se moveu mais que o limite especificado"""
+    fDistance = getEuclidianDistance(tplBefore, tplAfter)
+    return fDistance > fThreshold
 
 def wait(supSupervisor, iDurationMs):
     fStart = supSupervisor.getTime()
@@ -233,15 +237,21 @@ while supSupervisor.step(450) != -1:
         sBoxId = f"C{iNearestBoxIndex}"
         tplStartPos = dictInitialPositions[sBoxId]
         
+        tplPrePushPos = nodNearestBox.getPosition()[0:2]
+        
         pushBox(supSupervisor, motLeft, motRight)
         
         tplEndPos = nodNearestBox.getPosition()[0:2]
+        
+        bMoved = boxMovedSignificantly(tplPrePushPos, tplEndPos)
+        
         fMovedDistance = getEuclidianDistance(tplStartPos, tplEndPos)
         
-        print(f"Finalizou empurrar, indo para a próxima caixa")
         lstRemainingBoxes.pop(iNearestBoxIndex)
-        if fMovedDistance > 0.001:
+        if bMoved:
             rotateRobotInPlace(motLeft, motRight, supSupervisor)
+            
+        print(f"Finalizou empurrar, indo para a próxima caixa")
     else:
         navigateToTarget(robot, nodNearestBox, motLeft, motRight, supSupervisor)
 
