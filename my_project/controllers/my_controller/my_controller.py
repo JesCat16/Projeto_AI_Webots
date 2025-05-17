@@ -213,7 +213,12 @@ for iIdx, nodBox in enumerate(lstBoxes):
     tplStartPosition = dictInitialPositions[sBoxId]
     tplEndPosition = nodBox.getPosition()[0:2]
     fMovedDistance = getEuclidianDistance(tplStartPosition, tplEndPosition)
-    sBoxStatus = "LEVE" if fMovedDistance > 0.001 else "PESADA"
+    sBoxStatus = "LEVE" 
+    if fMovedDistance > 0.001:
+        motLeft.setVelocity(2.0)    # frente
+        motRight.setVelocity(-2.0)  # trás
+    else:
+         "PESADA"
     if fMovedDistance <= 0.001 and sBoxStatus == "LEVE":
         print(f"     [ALERTA] A caixa {sBoxId} foi marcada como LEVE, mas não se moveu!")
     print(f" - {sBoxId}")
