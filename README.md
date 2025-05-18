@@ -3,5 +3,5 @@
 - Jéssica Martins de Jesus
 - Bruno Andwele Alves Antunes
 
-Obs: Código fonte está localizado na pasta my_project/controllers/my_controller - Nome do código: my_controller.py
+Obs: Código fonte está localizado na pasta my_project/controllers/my_controller - Nome do código: my_controller.py<br>
 Vídeo: https://youtu.be/HR_NOInbjKY
