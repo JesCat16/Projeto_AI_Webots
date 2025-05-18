@@ -257,7 +257,7 @@ while supSupervisor.step(450) != -1:
     else:
         navigateToTarget(robot, nodNearestBox, motLeft, motRight, supSupervisor)
 
-print("\n[RESULTADO FINAL] Análise do deslocamento das caixas:")
+#print("\n[RESULTADO FINAL] Análise do deslocamento das caixas:")
 for iIdx, nodBox in enumerate(lstBoxes):
     sBoxId = f"C{iIdx}"
     tplStartPosition = dictInitialPositions[sBoxId]
@@ -266,8 +266,8 @@ for iIdx, nodBox in enumerate(lstBoxes):
     sBoxStatus = "LEVE" if fMovedDistance > 0.001 else "PESADA"
     if fMovedDistance <= 0.001 and sBoxStatus == "LEVE":
         print(f"     [ALERTA] A caixa {sBoxId} foi marcada como LEVE, mas não se moveu!")
-    print(f" - {sBoxId}")
-    print(f"     Posição inicial: X={tplStartPosition[0]:.2f}, Y={tplStartPosition[1]:.2f}")
-    print(f"     Posição final  : X={tplEndPosition[0]:.2f}, Y={tplEndPosition[1]:.2f}")
-    print(f"     Deslocamento   : {fMovedDistance:.4f} metros")
-    print(f"     Resultado      : {sBoxStatus}")
+    #print(f" - {sBoxId}")
+    #print(f"     Posição inicial: X={tplStartPosition[0]:.2f}, Y={tplStartPosition[1]:.2f}")
+    #print(f"     Posição final  : X={tplEndPosition[0]:.2f}, Y={tplEndPosition[1]:.2f}")
+    #print(f"     Deslocamento   : {fMovedDistance:.4f} metros")
+    #print(f"     Resultado      : {sBoxStatus}")

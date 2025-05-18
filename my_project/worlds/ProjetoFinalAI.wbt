@@ -8,8 +8,8 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.5563260007941869 0.6582882971254166 0.5071073838035348 2.060686689859936
-  position -0.1871525032962644 0.33363815717300577 2.7800378752293216
+  orientation -0.5773502691896258 0.5773502691896258 0.5773502691896258 2.0944
+  position 0.3733898190536363 0.21024650298826114 2.8397203313753745
 }
 TexturedBackground {
 }
@@ -18,10 +18,8 @@ TexturedBackgroundLight {
 RectangleArena {
 }
 DEF ROBO E-puck {
-  hidden translation_1 0 0.025999999999999995 0.02
   hidden rotation_1 0 0.9999999999999999 0 1.8322182380913952
-  hidden translation_2 0 -0.026 0.02
-  hidden rotation_2 0 -1 0 0.179941264460205
+  hidden rotation_2 0 -0.9999999999999999 0 0.179941264460205
   translation 0.116159 0.0821222 0.000578493
   rotation -3.801865575133001e-05 0.0010553622407590804 0.9999994423824057 -3.0619190310022657
   controller "my_controller"
@@ -104,49 +102,6 @@ DEF C5 Solid {
     }
   ]
   name "wooden box(5)"
-  model "wooden box"
-  boundingObject Box {
-    size 0.1 0.1 0.1
-  }
-  physics DEF C0 Physics {
-    density -1
-    mass 10
-  }
-}
-DEF C4 Solid {
-  translation -0.03000080967890488 0.3777315577428059 0.04607665879829337
-  rotation -0.3255336923792167 0.16217579104537191 -0.9315185601611818 3.380238887239624e-05
-  children [
-    DEF BOX_SHAPE Shape {
-      appearance PBRAppearance {
-        baseColorMap ImageTexture {
-          url [
-            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/textures/wooden_box_base_color.jpg"
-          ]
-        }
-        roughnessMap ImageTexture {
-          url [
-            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/textures/wooden_box_roughness.jpg"
-          ]
-        }
-        metalness 0
-        normalMap ImageTexture {
-          url [
-            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/textures/wooden_box_normal.jpg"
-          ]
-        }
-        occlusionMap ImageTexture {
-          url [
-            "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/textures/wooden_box_occlusion.jpg"
-          ]
-        }
-      }
-      geometry Box {
-        size 0.1 0.1 0.1
-      }
-    }
-  ]
-  name "wooden box(4)"
   model "wooden box"
   boundingObject Box {
     size 0.1 0.1 0.1
